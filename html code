@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gorilla Tag Player Checker</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #3e8e41;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3e8e41;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #365e31;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .error {
+            color: #ff4c4c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gorilla Tag Player Checker</h1>
+        <p>Enter your PlayFab ID and Photon ID below: - Made By "torchfrfr" On Discord (dont delete this u skid)</p>
+
+        <input type="text" id="playfab-id" placeholder="Enter PlayFab ID" />
+        <input type="text" id="photon-id" placeholder="Enter Photon Realtime ID" />
+        <input type="text" id="photon-id" placeholder="Enter Photon VoiceChat ID" />
+        <button onclick="checkPlayers()">Check Players </button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Function to handle the check players action
+        async function checkPlayers() {
+            const playfabId = document.getElementById("playfab-id").value;
+            const photonId = document.getElementById("photon-id").value;
+            const resultElement = document.getElementById("result");
+
+            // Validate input
+            if (!playfabId || !photonId) {
+                resultElement.textContent = "Please enter both PlayFab ID and Photon ID (s).";
+                resultElement.classList.add('error');
+                return;
+            }
+
+            resultElement.textContent = "Checking players...";
+
+            try {
+                // Call the PlayFab API
+                const playfabData = await fetchPlayFabData(playfabId);
+
+                if (playfabData.error) {
+                    resultElement.textContent = `Error: ${playfabData.error}`;
+                    resultElement.classList.add('error');
+                    return;
+                }
+
+                // Call the Photon API
+                const photonData = await fetchPhotonData(photonId);
+
+                if (photonData.error) {
+                    resultElement.textContent = `Error: ${photonData.error}`;
+                    resultElement.classList.add('error');
+                    return;
+                }
+
+                // Display the results
+                resultElement.textContent = `Players online: ${photonData.playersOnline}`;
+                resultElement.classList.remove('error');
+
+            } catch (error) {
+                resultElement.textContent = "Error connecting to the server.";
+                resultElement.classList.add('error');
+            }
+        }
+
+        // Function to fetch data from PlayFab API (dummy example)
+        async function fetchPlayFabData(playfabId) {
+            const apiUrl = `https://your-playfab-api-url.com/${playfabId}`; // Example API URL
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer YOUR_PLAYFAB_API_KEY', // Use a secure API key
+                    },
+                });
+
+                if (!response.ok) {
+                    return { error: 'Failed to fetch PlayFab data.' };
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return { error: 'Failed to connect to PlayFab API.' };
+            }
+        }
+
+        // Function to fetch data from Photon API (dummy example)
+        async function fetchPhotonData(photonId) {
+            const apiUrl = `https://your-photon-api-url.com/${photonId}`; // Example API URL
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer YOUR_PHOTON_API_KEY', // Use a secure API key
+                    },
+                });
+
+                if (!response.ok) {
+                    return { error: 'Failed to fetch Photon data.' };
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return { error: 'Failed to connect to Photon API.' };
+            }
+        }
+    </script>
+</body>
+</html>
