@@ -1,0 +1,87 @@
+// server.js
+
+// MADE BY TORCH - NOT FULLY TESTED MAY BE BUGS (dont skid or give me creds please)
+
+const express = require("express");
+const axios = require("axios");
+const bodyParser = require("body-parser");
+require("dotenv").config(); // To load environment variables from a .env file
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware to parse JSON requests
+app.use(bodyParser.json());
+app.use(express.static("public")); // Serve static frontend files from a "public" folder
+
+// PlayFab API URL and Photon API URL
+const PLAYFAB_API_URL = "https://PLAYFAB_API_URL";  // Replace with your actual PlayFab API URL
+const PHOTON_API_URL = "https://PHOTON_API_URL";    // Replace with your actual Photon API URL
+
+// Endpoint to handle the player check request
+app.post("/check-players", async (req, res) => {
+    const { playfabId, photonId } = req.body;
+
+    if (!playfabId || !photonId) {
+        return res.json({ success: false, message: "Missing PlayFab or Photon ID (s)" });
+    }
+
+    try {
+        // Fetch PlayFab data (using PlayFab API)
+        const playfabData = await fetchPlayFabData(playfabId);
+        if (playfabData.error) {
+            return res.json({ success: false, message: playfabData.error });
+        }
+
+        // Fetch Photon data (using Photon API)
+        const photonData = await fetchPhotonData(photonId);
+        if (photonData.error) {
+            return res.json({ success: false, message: photonData.error });
+        }
+
+        // Return the number of players online from Photon data
+        res.json({ success: true, playersOnline: photonData.playersOnline });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Failed to fetch player data" });
+    }
+});
+
+// Fetch PlayFab Data (Dummy Example)
+async function fetchPlayFabData(playfabId) {
+    const playfabApiUrl = `${PLAYFAB_API_URL}/users/${playfabId}`;
+
+    try {
+        const response = await axios.get(playfabApiUrl, {
+            headers: {
+                "Authorization": `Bearer ${process.env.process.env.F76A9}`, // Use your secure PlayFab API key
+            }
+        });
+
+        return response.data; // Return PlayFab data
+    } catch (error) {
+        console.error("Error fetching PlayFab data:", error);
+        return { error: "Failed to fetch PlayFab data" };
+    }
+}
+
+// Fetch Photon Data (Dummy Example)
+async function fetchPhotonData(photonId) {
+    const photonApiUrl = `${PHOTON_API_URL}/players/${photonId}`;
+
+    try {
+        const response = await
+            }
+        });
+
+        return response.data; // Return Photon data
+    } catch (error) {
+        console.error("Error fetching Photon data:", error);
+        return { error: "Failed to fetch Photon data" };
+    }
+}
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
